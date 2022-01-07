@@ -1,4 +1,4 @@
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.http import JsonResponse
 from .Num2Words import Num2Words
 import json
@@ -17,8 +17,14 @@ def handler_server_error(request):
 
 
 @csrf_exempt
+#@ensure_csrf_cookie
 def num_to_english(request):
     try:
+        if request.method  not in ("POST", "GET"):
+            return JsonResponse({"status": 'error',
+                                 "num_in_english": f'{request.method} is not allowed'
+                                 })
+
         data = json.loads(request.body) if request.method == "POST" else request.GET
         number = data.get('number')
 
@@ -36,3 +42,5 @@ def num_to_english(request):
         return JsonResponse({"status": 'error',
                              "num_in_english": 'Internal error'
                              })
+
+
