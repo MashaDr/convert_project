@@ -1,8 +1,10 @@
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
+from rest_framework.response import Response
 from .Num2Words import Num2Words
 import json
+
 
 def handler_not_found(request, exception=None):
     return JsonResponse({
@@ -17,10 +19,8 @@ def handler_server_error(request):
 
 
 @csrf_exempt
-#@ensure_csrf_cookie
 def num_to_english(request):
     try:
-        print(f'request.method  ==> {request.method }')
         if request.method not in ("POST", "GET"):
             return JsonResponse({"status": 'error',
                                  "num_in_english": f'{request.method} is not allowed'
@@ -39,14 +39,27 @@ def num_to_english(request):
         return JsonResponse({"status": code,
                              "num_in_english": words
                              })
+    except json.decoder.JSONDecodeError:
+        return Response({"status": 'error',
+                         "num_in_english": 'Incorrect JSON format'
+                         })
     except Exception as e:
         return JsonResponse({"status": 'error',
                              "num_in_english": 'Internal error'
                              })
 
 
+@api_view(['GET'])
+def api_overview(request):
+    api_urls = {
+        'Convert a number to the words (Django)': '/num_to_english',
+        'Convert a number to the words(Django Rest Framework)': '/num_to_english1',
+    }
+    return Response(api_urls)
+
+
 @api_view(['GET', 'POST'])
-def num_to_english1(request):
+def num_to_words(request):
     try:
         data = json.loads(request.body) if request.method == "POST" else request.GET
         number = data.get('number')
@@ -58,10 +71,14 @@ def num_to_english1(request):
             words = 'Error: Invalid input.'
 
         code = "error" if 'Error' in words else "ok"
-        return JsonResponse({"status": code,
-                             "num_in_english": words
-                             })
+        return Response({"status": code,
+                         "num_in_english": words
+                         })
+    except json.decoder.JSONDecodeError:
+        return Response({"status": 'error',
+                         "num_in_english": 'Incorrect JSON format'
+                         })
     except Exception as e:
-        return JsonResponse({"status": 'error',
-                             "num_in_english": 'Internal error'
-                             })
+        return Response({"status": 'error',
+                         "num_in_english": 'Internal error'
+                         })
