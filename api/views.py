@@ -45,7 +45,7 @@ def num_to_english(request):
                          })
     except Exception as e:
         return JsonResponse({"status": 'error',
-                             "num_in_english": 'Internal error'
+                             "num_in_english": f'Internal error {e}'
                              })
 
 
@@ -61,7 +61,7 @@ def api_overview(request):
 @api_view(['GET', 'POST'])
 def num_to_words(request):
     try:
-        data = json.loads(request.body) if request.method == "POST" else request.GET
+        data = request.data if request.method == "POST" else request.query_params
         number = data.get('number')
 
         if number and number.isnumeric():
@@ -74,11 +74,7 @@ def num_to_words(request):
         return Response({"status": code,
                          "num_in_english": words
                          })
-    except json.decoder.JSONDecodeError:
-        return Response({"status": 'error',
-                         "num_in_english": 'Incorrect JSON format'
-                         })
     except Exception as e:
         return Response({"status": 'error',
-                         "num_in_english": 'Internal error'
+                         "num_in_english": f'Internal error {e}'
                          })
