@@ -25,7 +25,6 @@ def num_to_english(request):
             return JsonResponse({"status": 'error',
                                  "num_in_english": f'{request.method} is not allowed'
                                  })
-
         data = json.loads(request.body) if request.method == "POST" else request.GET
         number = data.get('number')
 
@@ -40,9 +39,9 @@ def num_to_english(request):
                              "num_in_english": words
                              })
     except json.decoder.JSONDecodeError:
-        return Response({"status": 'error',
-                         "num_in_english": 'Incorrect JSON format'
-                         })
+        return JsonResponse({"status": 'error',
+                             "num_in_english": 'Incorrect JSON format'
+                             })
     except Exception as e:
         return JsonResponse({"status": 'error',
                              "num_in_english": f'Internal error {e}'
