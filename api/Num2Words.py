@@ -55,9 +55,14 @@ class Num2Words:
             # Splits a number into 3-digit chunks starting from the right side
             # For example, num=1345678. It processes 678 first, 345 next, and 1 at the end.
             if num % 1000 != 0:
-                tmp = [Num2Words.bigs[i]] + result if i != 0 else result
-                result = Num2Words.to_words(num % 1000) + tmp
+                if i == 0:
+                    result = Num2Words.to_words(num % 1000)
+                else:
+                    result = Num2Words.to_words(num % 1000) + [Num2Words.bigs[i]] + result
             num //= 1000
+
+            if not num:
+                break
         return ' '.join(result)
 
 
